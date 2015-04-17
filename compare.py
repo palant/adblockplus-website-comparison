@@ -3,44 +3,57 @@
 
 import argparse
 import difflib
+import logging
 import re
 import sys
 import tarfile
 
-def tarfiles(archive, mapper):
+def tarfiles(archive, filter):
   for info in archive.getmembers():
     if info.isfile():
-      mapped = mapper(re.sub(r'^\.\/', '', info.name))
-      if mapped:
-        yield mapped
+      name = re.sub(r'^\.\/', '', info.name)
+      if filter(name):
+        yield name
 
-def map_generic(name):
-  if re.search(r'^(?!js)\w\w(_\w\w)?/', name):
-    return name
-  else:
-    return None
+def filter_generic(name):
+  return re.search(r'^(?!js)\w\w(_\w\w)?/', name)
 
-def map_anwiki(name):
-  if '/_include/' in name:
-    return None
-  return map_generic(name)
+def filter_anwiki(name):
+  return '/_include/' not in name and filter_generic(name)
 
-def map_cms(name):
+def filter_cms(name):
   if '/animations/' in name:
-    return None
+    return False
+  if '/' in name and name.rsplit('/', 1)[1] == 'index':
+    return False
+  return filter_generic(name)
+
+def cms_to_anwiki(name):
   if '/' in name:
     dir, file = name.rsplit('/', 1)
-    if file == 'index':
-      return None
     if file in ('firefox', 'chrome', 'opera', 'safari', 'internet-explorer', 'android', 'yandex-browser', 'maxthon'):
-      name = '/'.join((dir, 'index'))
-  return map_generic(name)
+      return '/'.join((dir, 'index'))
+  return name
+
+def compare_file(anwiki, anwiki_name, cms, cms_name):
+  pass
 
 def compare(anwiki, cms):
-  files1 = sorted(set(tarfiles(anwiki, map_anwiki)))
-  files2 = sorted(set(tarfiles(cms, map_cms)))
-  for line in difflib.context_diff(files1, files2):
-    sys.stdout.write(line if line.endswith('\n') else line + '\n')
+  anwiki_files = sorted(tarfiles(anwiki, filter_anwiki))
+  cms_files = sorted(tarfiles(cms, filter_cms))
+  seen = set()
+  for name in cms_files:
+    translated = cms_to_anwiki(name)
+    if translated in anwiki_files:
+      compare_file(anwiki, translated, cms, name)
+      seen.add(translated)
+    else:
+      logging.warn('CMS file %s has no Anwiki correspondence' % name)
+
+  for name in anwiki_files:
+    if name not in seen:
+      logging.warn('Anwiki file %s has no CMS correspondence' % name)
+
 
 parser = argparse.ArgumentParser(description='Compare static content')
 parser.add_argument('anwiki', metavar='anwiki.tgz', help='Anwiki-generated pages')
