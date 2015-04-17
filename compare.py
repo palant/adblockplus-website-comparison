@@ -47,6 +47,11 @@ def sort_attributes(data):
     return '<%s %s>' % (match.group(1), ' '.join(attributes))
   return re.sub(r'<(\w+)\s+[^>]+>', do_sort, data)
 
+def normalize_contents(data):
+  data = sort_attributes(data)
+  data = re.sub(r'\s+$', '', data, flags=re.M)
+  return data.strip()
+
 def process_anwiki_contents(data):
   # Remove boilerplate
   data = re.sub(r'^.*?<div class="viewcontent [^>]*>', '', data, flags=re.S)
@@ -61,18 +66,14 @@ def process_anwiki_contents(data):
   # Remove "untranslated" markers
   data = re.sub(r'<span class="untranslated">(.*?)</span>', r'\1', data)
 
-  # Generalize HTML code
-  data = sort_attributes(data)
-  return data.strip()
+  return normalize_contents(data)
 
 def process_cms_contents(data):
   # Remove boilerplate
   data = re.sub(r'^.*?<div id="content"[^>]*>', '', data, flags=re.S)
   data = re.sub(r'</div>\s*<footer>.*', '', data, flags=re.S)
 
-  # Generalize HTML code
-  data = sort_attributes(data)
-  return data.strip()
+  return normalize_contents(data)
 
 def compare_file(anwiki, anwiki_name, cms, cms_name):
   anwiki_data = anwiki.extractfile('./' + anwiki_name).read()
