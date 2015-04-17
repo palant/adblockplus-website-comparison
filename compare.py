@@ -74,7 +74,7 @@ def process_anwiki_contents(data):
   data = re.sub(r'<.*?>|[^<>]+', escape_quotes, data)
 
   # Remove "untranslated" markers
-  data = re.sub(r'<span class="untranslated">(.*?)</span>', r'\1', data)
+  data = re.sub(r'<span class="untranslated">(.*?)</span>', r'\1', data, flags=re.S)
 
   # Simplify script and image URLs
   data = data.replace('/_override-static/global/global', '')
