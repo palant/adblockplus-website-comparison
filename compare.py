@@ -68,6 +68,8 @@ def process_anwiki_contents(data):
 
   # Simplify script and image URLs
   data = data.replace('/_override-static/global/global', '')
+  data = re.sub(r'\?a=show("(?:>|\s))', r'\1', data)
+  data = re.sub(r'\?\d+("(?:>|\s))', r'\1', data)
 
   return normalize_contents(data)
 
@@ -75,6 +77,9 @@ def process_cms_contents(data):
   # Remove boilerplate
   data = re.sub(r'^.*?<div id="content"[^>]*>', '', data, flags=re.S)
   data = re.sub(r'</div>\s*<footer>.*', '', data, flags=re.S)
+
+  # Simplify script and image URLs
+  data = re.sub(r'\?\d+("(?:>|\s))', r'\1', data)
 
   return normalize_contents(data)
 
