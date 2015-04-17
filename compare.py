@@ -64,6 +64,14 @@ def process_anwiki_contents(data):
   # Remove duplicated hreflang attributes
   data = re.sub(r'(hreflang="[^">]*")(?:\s+hreflang="[^">]*")+', r'\1', data)
 
+  # Escape quotation marks outside of tags
+  def escape_quotes(match):
+    match = match.group(0)
+    if match.startswith('<'):
+      return match
+    return match.replace('"', '&quot;').replace("'", '&#39;')
+  data = re.sub(r'<.*?>|[^<>]+', escape_quotes, data)
+
   # Remove "untranslated" markers
   data = re.sub(r'<span class="untranslated">(.*?)</span>', r'\1', data)
 
