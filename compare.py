@@ -2,11 +2,13 @@
 # coding: utf-8
 
 import argparse
+import cgi
 import difflib
 import logging
 import re
 import sys
 import tarfile
+from xml.dom import minidom
 
 def tarfiles(archive, filter):
   for info in archive.getmembers():
@@ -35,14 +37,32 @@ def cms_to_anwiki(name):
       return '/'.join((dir, 'index'))
   return name
 
+def sort_attributes(data):
+  def do_sort(match):
+    source = '%s</%s>' % (re.sub(r'/>$', '>', match.group(0)), match.group(1))
+    element = minidom.parseString(source).documentElement
+    attributes = []
+    for name, value in sorted(element.attributes.items()):
+      attributes.append('%s="%s"' % (cgi.escape(name).encode('utf-8'), cgi.escape(value).encode('utf-8')))
+    return '<%s %s>' % (match.group(1), ' '.join(attributes))
+  return re.sub(r'<(\w+)\s+[^>]+>', do_sort, data)
+
 def process_anwiki_contents(data):
   # Remove boilerplate
   data = re.sub(r'^.*?<div class="viewcontent [^>]*>', '', data, flags=re.S)
   data = re.sub(r'</div>\s*</div>\s*<footer>.*', '', data, flags=re.S)
 
+  # Fix unescaped ampersands
+  data = re.sub(r'&(?!\w+;)', '&amp;', data)
+
+  # Remove duplicated hreflang attributes
+  data = re.sub(r'(hreflang="[^">]*")(?:\s+hreflang="[^">]*")+', r'\1', data)
+
   # Remove "untranslated" markers
   data = re.sub(r'<span class="untranslated">(.*?)</span>', r'\1', data)
 
+  # Generalize HTML code
+  data = sort_attributes(data)
   return data.strip()
 
 def process_cms_contents(data):
@@ -50,12 +70,18 @@ def process_cms_contents(data):
   data = re.sub(r'^.*?<div id="content"[^>]*>', '', data, flags=re.S)
   data = re.sub(r'</div>\s*<footer>.*', '', data, flags=re.S)
 
+  # Generalize HTML code
+  data = sort_attributes(data)
   return data.strip()
 
-
 def compare_file(anwiki, anwiki_name, cms, cms_name):
-  anwiki_data = process_anwiki_contents(anwiki.extractfile('./' + anwiki_name).read())
-  cms_data = process_cms_contents(cms.extractfile('./' + cms_name).read())
+  anwiki_data = anwiki.extractfile('./' + anwiki_name).read()
+  if not anwiki_name.endswith('.png'):
+    anwiki_data = process_anwiki_contents(anwiki_data)
+
+  cms_data = cms.extractfile('./' + cms_name).read()
+  if not cms_name.endswith('.png'):
+    cms_data = process_cms_contents(cms_data)
 
   if anwiki_data != cms_data:
     print "Anwiki file %s and CMS file %s differ:" % (anwiki_name, cms_name)
