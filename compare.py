@@ -116,8 +116,9 @@ def compare(anwiki, cms):
   for name in cms_files:
     translated = cms_to_anwiki(name)
     if translated in anwiki_files:
-      compare_file(anwiki, translated, cms, name)
-      seen.add(translated)
+      if not translated in seen:
+        compare_file(anwiki, translated, cms, name)
+        seen.add(translated)
     else:
       logging.warn('CMS file %s has no Anwiki correspondence' % name)
 
