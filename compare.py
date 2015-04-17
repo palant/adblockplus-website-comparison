@@ -50,6 +50,7 @@ def sort_attributes(data):
 def normalize_contents(data):
   data = sort_attributes(data)
   data = re.sub(r'\s+$', '', data, flags=re.M)
+  data = re.sub(r'[\t ]+', ' ', data)
   return data.strip()
 
 def process_anwiki_contents(data):
