@@ -66,6 +66,9 @@ def process_anwiki_contents(data):
   # Remove "untranslated" markers
   data = re.sub(r'<span class="untranslated">(.*?)</span>', r'\1', data)
 
+  # Simplify script and image URLs
+  data = data.replace('/_override-static/global/global', '')
+
   return normalize_contents(data)
 
 def process_cms_contents(data):
