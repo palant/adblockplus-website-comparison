@@ -52,6 +52,9 @@ def normalize_contents(data):
   data = re.sub(r'^\s+', '', data, flags=re.M)
   data = re.sub(r'\s+$', '', data, flags=re.M)
   data = re.sub(r'[\t ]+', ' ', data)
+  data = re.sub(r'>\s+', '>\n', data, flags=re.S)
+  data = re.sub(r'\s+<', '\n<', data, flags=re.S)
+  data = re.sub(r'>\s*<', '>\n<', data, flags=re.S)
   return data.strip()
 
 def process_anwiki_contents(data):
