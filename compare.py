@@ -106,8 +106,8 @@ def compare_file(anwiki, anwiki_name, cms, cms_name):
     cms_data = process_cms_contents(cms_data)
 
   if anwiki_data != cms_data:
-    print "Anwiki file %s and CMS file %s differ:" % (anwiki_name, cms_name)
-    for line in difflib.unified_diff(anwiki_data.splitlines(True), cms_data.splitlines(True)):
+    logging.warn("Anwiki file %s and CMS file %s differ" % (anwiki_name, cms_name))
+    for line in difflib.unified_diff(anwiki_data.splitlines(True), cms_data.splitlines(True), anwiki_name, cms_name):
       sys.stdout.write(line if line.endswith('\n') else line + '\n')
     print
     print
