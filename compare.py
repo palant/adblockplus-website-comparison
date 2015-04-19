@@ -45,7 +45,7 @@ def sort_attributes(data):
     for name, value in sorted(element.attributes.items()):
       attributes.append('%s="%s"' % (cgi.escape(name).encode('utf-8'), cgi.escape(value).encode('utf-8')))
     return '<%s %s>' % (match.group(1), ' '.join(attributes))
-  return re.sub(r'<(\w+)\s+[^>]+>', do_sort, data)
+  return re.sub(r'<(\w+)\s+[^>]*[^>/]/?>', do_sort, data)
 
 def normalize_contents(data):
   data = sort_attributes(data)
