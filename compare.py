@@ -62,6 +62,9 @@ def process_anwiki_contents(data):
   # Fix unescaped ampersands
   data = re.sub(r'&(?!\w+;)', '&amp;', data)
 
+  # <br />   =>   <br>
+  data = data.replace('<br />', '<br>')
+
   # Remove duplicated hreflang attributes
   data = re.sub(r'(hreflang="[^">]*")(?:\s+hreflang="[^">]*")+', r'\1', data)
 
