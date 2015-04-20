@@ -87,6 +87,9 @@ def process_anwiki_contents(data, pagename, existant_files):
       return ' href="/en/%s" hreflang="en"' % pagename
   data = re.sub(r' href="/(%s/[^"]+)" hreflang="%s"' % (locale, locale), check_link, data)
 
+  # Remove unnecessary list items in ToC
+  data = re.sub(r'</li>\s*<li>\s*<ul>', '<ul>', data, flags=re.S)
+
   # Remove duplicated hreflang attributes
   data = re.sub(r'(hreflang="[^">]*")(?:\s+hreflang="[^">]*")+', r'\1', data)
 
