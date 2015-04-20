@@ -81,6 +81,9 @@ def process_anwiki_contents(data, pagename, existant_files):
   # Fix unresolved links to home page
   data = re.sub(r' href="(firefox|chrome|opera|safari|internet-explorer|android|yandex-browser|maxthon)"', r' href="/%s/\1" hreflang="%s"' % (locale, locale), data)
 
+  # Add trailing slash to language roots links
+  data = re.sub(r'( href="/\w\w(?:_\w\w)?)(")', r'\1/\2', data)
+
   # Fix Anwiki linking to non-existant pages
   def check_link(match):
     if cms_to_anwiki(re.sub(r'#.*', '', match.group(1))) in existant_files:
