@@ -59,6 +59,7 @@ def normalize_contents(data):
   data = re.sub(r'&mdash;', u'\u2014'.encode('utf-8'), data)
   data = re.sub(r'&nbsp;', u'\u00A0'.encode('utf-8'), data)
   data = re.sub(r'&copy;', u'\u00A9'.encode('utf-8'), data)
+  data = re.sub(r'&#34;', '&quot;', data)
   return data.strip()
 
 def process_anwiki_contents(data, pagename, existant_files):
