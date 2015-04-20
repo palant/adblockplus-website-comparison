@@ -90,6 +90,9 @@ def process_anwiki_contents(data, pagename, existant_files):
   # Remove unnecessary list items in ToC
   data = re.sub(r'</li>\s*<li>\s*<ul>', '<ul>', data, flags=re.S)
 
+  # Fix missing hreflang in <anwtoc> output
+  data = re.sub(r'(<a href="/(\w\w(_\w\w)?)/[^"]+")(?! hreflang)', r'\1 hreflang="\2"', data)
+
   # Remove duplicated hreflang attributes
   data = re.sub(r'(hreflang="[^">]*")(?:\s+hreflang="[^">]*")+', r'\1', data)
 
