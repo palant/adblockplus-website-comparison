@@ -69,6 +69,9 @@ def process_anwiki_contents(data, pagename, existant_files):
   data = re.sub(r'^.*?<div class="viewcontent [^>]*>', '', data, flags=re.S)
   data = re.sub(r'</div>\s*</div>\s*<footer>.*', '', data, flags=re.S)
 
+  if re.sub(r'.*/', '', pagename) in ('acceptable-ads-manifesto', 'customize-facebook', 'customize-youtube', 'share'):
+    data = re.sub(r'^\s*<h1>.*?</h1>', '', data, flags=re.S)
+
   # Fix unescaped ampersands
   data = re.sub(r'&(?!\w+;)', '&amp;', data)
 
@@ -114,10 +117,14 @@ def process_anwiki_contents(data, pagename, existant_files):
 
   return normalize_contents(data)
 
-def process_cms_contents(data):
+def process_cms_contents(data, pagename):
   # Remove boilerplate
-  data = re.sub(r'^.*?<div id="content"[^>]*>', '', data, flags=re.S)
-  data = re.sub(r'</div>\s*<footer>.*', '', data, flags=re.S)
+  if re.sub(r'.*/', '', pagename) in ('acceptable-ads-manifesto', 'customize-facebook', 'customize-youtube', 'share'):
+    data = re.sub(r'.*<body>', '', data, flags=re.S)
+    data = re.sub(r'</body>.*', '', data, flags=re.S)
+  else:
+    data = re.sub(r'^.*?<div id="content"[^>]*>', '', data, flags=re.S)
+    data = re.sub(r'</div>\s*<footer>.*', '', data, flags=re.S)
 
   # Simplify script and image URLs
   data = re.sub(r'\?\d+("(?:>|\s))', r'\1', data)
@@ -131,7 +138,7 @@ def compare_file(anwiki, anwiki_name, anwiki_files, cms, cms_name):
 
   cms_data = cms.extractfile('./' + cms_name).read()
   if not cms_name.endswith('.png'):
-    cms_data = process_cms_contents(cms_data)
+    cms_data = process_cms_contents(cms_data, cms_name)
 
   if anwiki_data != cms_data:
     logging.warn("Anwiki file %s and CMS file %s differ" % (anwiki_name, cms_name))
