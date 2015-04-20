@@ -61,7 +61,7 @@ def normalize_contents(data):
   data = re.sub(r'&copy;', u'\u00A9'.encode('utf-8'), data)
   return data.strip()
 
-def process_anwiki_contents(data, pagename):
+def process_anwiki_contents(data, pagename, existant_files):
   locale, pagename = pagename.split('/', 1)
 
   # Remove boilerplate
@@ -76,6 +76,15 @@ def process_anwiki_contents(data, pagename):
 
   # Fix unresolved links to home page
   data = re.sub(r' href="(firefox|chrome|opera|safari|internet-explorer|android|yandex-browser|maxthon)"', r' href="/%s/\1" hreflang="%s"' % (locale, locale), data)
+
+  # Fix Anwiki linking to non-existant pages
+  def check_link(match):
+    if cms_to_anwiki(re.sub(r'#.*', '', match.group(1))) in existant_files:
+      return match.group(0)
+    else:
+      locale, pagename = match.group(1).split('/', 1)
+      return ' href="/en/%s" hreflang="en"' % pagename
+  data = re.sub(r' href="/(%s/[^"]+)" hreflang="%s"' % (locale, locale), check_link, data)
 
   # Remove duplicated hreflang attributes
   data = re.sub(r'(hreflang="[^">]*")(?:\s+hreflang="[^">]*")+', r'\1', data)
@@ -108,10 +117,10 @@ def process_cms_contents(data):
 
   return normalize_contents(data)
 
-def compare_file(anwiki, anwiki_name, cms, cms_name):
+def compare_file(anwiki, anwiki_name, anwiki_files, cms, cms_name):
   anwiki_data = anwiki.extractfile('./' + anwiki_name).read()
   if not anwiki_name.endswith('.png'):
-    anwiki_data = process_anwiki_contents(anwiki_data, anwiki_name)
+    anwiki_data = process_anwiki_contents(anwiki_data, anwiki_name, anwiki_files)
 
   cms_data = cms.extractfile('./' + cms_name).read()
   if not cms_name.endswith('.png'):
@@ -132,7 +141,7 @@ def compare(anwiki, cms):
     translated = cms_to_anwiki(name)
     if translated in anwiki_files:
       if not translated in seen:
-        compare_file(anwiki, translated, cms, name)
+        compare_file(anwiki, translated, anwiki_files, cms, name)
         seen.add(translated)
     else:
       logging.warn('CMS file %s has no Anwiki correspondence' % name)
