@@ -61,7 +61,9 @@ def normalize_contents(data):
   data = re.sub(r'&copy;', u'\u00A9'.encode('utf-8'), data)
   return data.strip()
 
-def process_anwiki_contents(data):
+def process_anwiki_contents(data, pagename):
+  locale, pagename = pagename.split('/', 1)
+
   # Remove boilerplate
   data = re.sub(r'^.*?<div class="viewcontent [^>]*>', '', data, flags=re.S)
   data = re.sub(r'</div>\s*</div>\s*<footer>.*', '', data, flags=re.S)
@@ -71,6 +73,9 @@ def process_anwiki_contents(data):
 
   # <br />   =>   <br>
   data = data.replace('<br />', '<br>')
+
+  # Fix unresolved links to home page
+  data = re.sub(r' href="(firefox|chrome|opera|safari|internet-explorer|android|yandex-browser|maxthon)"', r' href="/%s/\1" hreflang="%s"' % (locale, locale), data)
 
   # Remove duplicated hreflang attributes
   data = re.sub(r'(hreflang="[^">]*")(?:\s+hreflang="[^">]*")+', r'\1', data)
@@ -106,7 +111,7 @@ def process_cms_contents(data):
 def compare_file(anwiki, anwiki_name, cms, cms_name):
   anwiki_data = anwiki.extractfile('./' + anwiki_name).read()
   if not anwiki_name.endswith('.png'):
-    anwiki_data = process_anwiki_contents(anwiki_data)
+    anwiki_data = process_anwiki_contents(anwiki_data, anwiki_name)
 
   cms_data = cms.extractfile('./' + cms_name).read()
   if not cms_name.endswith('.png'):
