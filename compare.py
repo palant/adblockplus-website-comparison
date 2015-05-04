@@ -59,7 +59,11 @@ def normalize_contents(data):
   data = re.sub(r'&mdash;', u'\u2014'.encode('utf-8'), data)
   data = re.sub(r'&nbsp;', u'\u00A0'.encode('utf-8'), data)
   data = re.sub(r'&copy;', u'\u00A9'.encode('utf-8'), data)
+  data = re.sub(r'&euro;', u'\u20AC'.encode('utf-8'), data)
+  data = re.sub(r'&#215;', u'\u00D7'.encode('utf-8'), data)
   data = re.sub(r'&#34;', '&quot;', data)
+  data = re.sub(r'&#42;', '*', data)
+  data = re.sub(r'&#x40;', '@', data)
   return data.strip()
 
 def process_anwiki_contents(data, pagename, existant_files):
