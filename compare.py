@@ -73,7 +73,7 @@ def process_anwiki_contents(data, pagename, existant_files):
     data = re.sub(r'^\s*<h1>.*?</h1>', '', data, flags=re.S)
 
   # Fix unescaped ampersands
-  data = re.sub(r'&(?!\w+;)', '&amp;', data)
+  data = re.sub(r'&(?!#?\w+;)', '&amp;', data)
 
   # <br />   =>   <br>
   data = data.replace('<br />', '<br>')
