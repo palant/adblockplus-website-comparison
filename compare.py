@@ -78,6 +78,15 @@ def process_anwiki_contents(data, pagename, existant_files):
   if re.sub(r'.*/', '', pagename) in ('acceptable-ads-manifesto', 'customize-facebook', 'customize-youtube', 'share'):
     data = re.sub(r'^\s*<h1>.*?</h1>', '', data, flags=re.S)
 
+  # Sort interface members
+  if '<hr />' in data:
+    def get_member_name(source):
+      match = re.search(r'<p id="(?:prop|method)_(\w+)">', source)
+      return match.group(1)
+    parts = data.split('<hr />')
+    parts = parts[0:1] + sorted(parts[1:], key=get_member_name)
+    data = '<hr />'.join(parts)
+
   # Fix unescaped ampersands
   data = re.sub(r'&(?!#?\w+;)', '&amp;', data)
 
