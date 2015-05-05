@@ -51,6 +51,7 @@ def normalize_contents(data):
   data = sort_attributes(data)
 
   # Normalize whitespace
+  data = data.replace(u'\u3000'.encode('utf-8'), ' ')   # ideographic space
   data = re.sub(r'^\s+', '', data, flags=re.M)
   data = re.sub(r'\s+$', '', data, flags=re.M)
   data = re.sub(r'[\t ]+', ' ', data)
