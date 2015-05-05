@@ -64,7 +64,7 @@ def normalize_contents(data):
   data = re.sub(r'&euro;', u'\u20AC'.encode('utf-8'), data)
   data = re.sub(r'&#215;', u'\u00D7'.encode('utf-8'), data)
   data = re.sub(r'&#34;', '&quot;', data)
-  data = re.sub(r'&#42;', '*', data)
+  data = re.sub(r'&#(?:42|x2A);', '*', data)
   data = re.sub(r'&#x40;', '@', data)
   return data.strip()
 
