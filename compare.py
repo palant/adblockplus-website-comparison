@@ -50,6 +50,11 @@ def sort_attributes(data):
 def normalize_contents(data):
   data = sort_attributes(data)
 
+  # KNOWN ISSUE: Ideographic full stop  shouldn't be followed up by whitespace,
+  # yet the CMS will occasionally insert it nevertheless. Ignore this issue to
+  # reduce noise.
+  data = data.replace(u'\u3002 '.encode('utf-8'), u'\u3002'.encode('utf-8'))
+
   # Normalize whitespace
   data = data.replace(u'\u3000'.encode('utf-8'), ' ')   # ideographic space
   data = re.sub(r'^\s+', '', data, flags=re.M)
