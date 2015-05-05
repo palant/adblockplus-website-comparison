@@ -117,6 +117,9 @@ def process_anwiki_contents(data, pagename, existant_files):
   # Remove "untranslated" markers
   data = re.sub(r'<span class="untranslated">(.*?)</span>', r'\1', data, flags=re.S)
 
+  # Remove animation.js includes
+  data = re.sub(r'<script src="/animation.js[^>]*></script>', '', data, flags=re.S)
+
   # Simplify script and image URLs
   data = data.replace('/_override-static/global/global', '')
   data = re.sub(r'\?a=show("(?:>|\s))', r'\1', data)
