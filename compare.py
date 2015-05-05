@@ -65,6 +65,7 @@ def normalize_contents(data):
   data = re.sub(r'>\s*<', '>\n<', data, flags=re.S)
   data = re.sub(r'(<(?:p|div|li|td|dd|dt|h1|h2|h3|h4)\b[^>]*>)\s*', '\\1\n', data, flags=re.S)
   data = re.sub(r'\s*(</(?:p|div|li|td|dd|dt|h1|h2|h3|h4)>)', '\n\\1', data, flags=re.S)
+  data = re.sub(r'\s*(<(?:br|hr)>)\s*', '\n\\1\n', data, flags=re.S)
   data = re.sub(r'([^>])[\r\n]+([^<])', r'\1 \2', data)
 
   # Normalize entities
