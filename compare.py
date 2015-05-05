@@ -84,6 +84,9 @@ def process_anwiki_contents(data, pagename, existant_files):
   # <br />   =>   <br>
   data = data.replace('<br />', '<br>')
 
+  # <hr />   =>   <hr>
+  data = data.replace('<hr />', '<hr>')
+
   # Fix unresolved links to home page
   data = re.sub(r' href="(firefox|chrome|opera|safari|internet-explorer|android|yandex-browser|maxthon)"', r' href="/%s/\1" hreflang="%s"' % (locale, locale), data)
 
