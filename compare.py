@@ -49,6 +49,8 @@ def sort_attributes(data):
 
 def normalize_contents(data):
   data = sort_attributes(data)
+
+  # Normalize whitespace
   data = re.sub(r'^\s+', '', data, flags=re.M)
   data = re.sub(r'\s+$', '', data, flags=re.M)
   data = re.sub(r'[\t ]+', ' ', data)
@@ -58,6 +60,8 @@ def normalize_contents(data):
   data = re.sub(r'(<(?:p|div|li|td|dd|dt|h1|h2|h3|h4)\b[^>]*>)\s*', '\\1\n', data, flags=re.S)
   data = re.sub(r'\s*(</(?:p|div|li|td|dd|dt|h1|h2|h3|h4)>)', '\n\\1', data, flags=re.S)
   data = re.sub(r'([^>])[\r\n]+([^<])', r'\1 \2', data)
+
+  # Normalize entities
   data = re.sub(r'&mdash;', u'\u2014'.encode('utf-8'), data)
   data = re.sub(r'&nbsp;', u'\u00A0'.encode('utf-8'), data)
   data = re.sub(r'&copy;', u'\u00A9'.encode('utf-8'), data)
@@ -66,6 +70,10 @@ def normalize_contents(data):
   data = re.sub(r'&#34;', '&quot;', data)
   data = re.sub(r'&#(?:42|x2A);', '*', data)
   data = re.sub(r'&#x40;', '@', data)
+
+  # %2F => / in URL parameters
+  data = re.sub(r' href=".*?"', lambda m: m.group(0).replace('%2F', '/'), data)
+
   return data.strip()
 
 def process_anwiki_contents(data, pagename, existant_files):
