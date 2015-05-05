@@ -78,6 +78,8 @@ def process_anwiki_contents(data, pagename, existant_files):
   if re.sub(r'.*/', '', pagename) in ('acceptable-ads-manifesto', 'customize-facebook', 'customize-youtube', 'share'):
     data = re.sub(r'^\s*<h1>.*?</h1>', '', data, flags=re.S)
 
+  data = re.sub(r'<!--.*?-->', '', data, flags=re.S)
+
   # Sort interface members
   if '<hr />' in data:
     def get_member_name(source):
