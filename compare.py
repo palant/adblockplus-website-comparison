@@ -114,6 +114,13 @@ def process_anwiki_contents(data, pagename, existant_files):
   # Remove unnecessary list items in ToC
   data = re.sub(r'</li>\s*<li>\s*<ul>', '<ul>', data, flags=re.S)
 
+  # Add <tbody> in preference table
+  data = re.sub(r'<table id="preftable">(.*?)</table>', r'<table id="preftable"><tbody>\1</tbody></table>', data, flags=re.S)
+
+  # Remove pointless <tt> tags in preference table
+  data = re.sub(r'<td><tt></tt></td>', r'<td>&nbsp;</td>', data, flags=re.S)
+  data = re.sub(r'<td><tt>(.*?)</tt></td>', r'<td>\1</td>', data, flags=re.S)
+
   # Fix missing hreflang in <anwtoc> output
   data = re.sub(r'(<a href="/(\w\w(_\w\w)?)/[^"]+")(?! hreflang)', r'\1 hreflang="\2"', data)
 
