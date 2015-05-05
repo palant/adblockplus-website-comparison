@@ -111,8 +111,8 @@ def process_anwiki_contents(data, pagename, existant_files):
     match = match.group(0)
     if match.startswith('<'):
       return match
-    return match.replace('"', '&quot;').replace("'", '&#39;')
-  data = re.sub(r'<.*?>|[^<>]+', escape_quotes, data)
+    return match.replace('"', '&quot;').replace("'", '&#39;').replace(">", '&gt;')
+  data = re.sub(r'<.*?>|[^<]+', escape_quotes, data)
 
   # Remove "untranslated" markers
   data = re.sub(r'<span class="untranslated">(.*?)</span>', r'\1', data, flags=re.S)
