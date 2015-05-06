@@ -119,6 +119,9 @@ def process_anwiki_contents(data, pagename, existant_files):
   # Add trailing slash to language roots links
   data = re.sub(r'( href="/\w\w(?:_\w\w)?)(")', r'\1/\2', data)
 
+  # Fix missing hreflang in <anwtoc> output
+  data = re.sub(r'(<a href="/(\w\w(_\w\w)?)/[^"]+")(?! hreflang)', r'\1 hreflang="\2"', data)
+
   # Fix Anwiki linking to non-existant pages
   def check_link(match):
     if cms_to_anwiki(re.sub(r'#.*', '', match.group(1))) in existant_files:
@@ -137,9 +140,6 @@ def process_anwiki_contents(data, pagename, existant_files):
   # Remove pointless <tt> tags in preference table
   data = re.sub(r'<td><tt></tt></td>', r'<td>&nbsp;</td>', data, flags=re.S)
   data = re.sub(r'<td><tt>(.*?)</tt></td>', r'<td>\1</td>', data, flags=re.S)
-
-  # Fix missing hreflang in <anwtoc> output
-  data = re.sub(r'(<a href="/(\w\w(_\w\w)?)/[^"]+")(?! hreflang)', r'\1 hreflang="\2"', data)
 
   # Remove duplicated hreflang attributes
   data = re.sub(r'(hreflang="[^">]*")(?:\s+hreflang="[^">]*")+', r'\1', data)
